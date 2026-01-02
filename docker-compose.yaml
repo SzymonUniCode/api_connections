@@ -1,0 +1,16 @@
+services:
+
+  api-connections:
+    restart: always
+    build:
+      context: ./app_connect
+      dockerfile: Dockerfile
+    volumes:
+      - ./app_connect:/app/app
+    ports:
+      - "5005:5005"
+    networks:
+      - app_connect
+
+networks:
+  app_connect:
