@@ -2,8 +2,8 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
-WORKDIR /app
 
 # system deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -20,6 +20,11 @@ RUN curl -sSL https://install.python-poetry.org | python3
 
 ENV PATH="/root/.local/bin:$PATH"
 # deps
+WORKDIR /app
+
+
+
+
 COPY pyproject.toml poetry.lock* ./
 
 RUN poetry config virtualenvs.create false && \
@@ -30,4 +35,4 @@ COPY . .
 
 EXPOSE 5005
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5005", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5005", "webapp.app:app"]
