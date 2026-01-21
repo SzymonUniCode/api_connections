@@ -6,9 +6,11 @@ services:
       context: ./app_connect
       dockerfile: Dockerfile
     volumes:
-      - ./app_connect:/app/app
+      - ./app_connect:/app
     ports:
       - "5005:5005"
+    env_file:
+      - .env
     networks:
       - app_connect
 

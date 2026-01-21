@@ -1,5 +1,6 @@
+import csv
+import io
 from typing import List, Dict
-from datetime import date
 
 from webapp.connections.base import BaseConnection
 
@@ -10,16 +11,16 @@ class BigMacIndex(BaseConnection):
     BASE_URL = (
         "https://raw.githubusercontent.com/"
         "TheEconomist/big-mac-data/master/"
-        "output-data/big-mac-full-index.json"
+        "output-data/big-mac-full-index.csv"
     )
 
-    def __init__(self, country: str):
+    def __init__(self, country: str = "United States"):
         self.country = country
 
-    def fetch(self, start_date: date, end_date: date) -> List[Dict]:
-        raw_data = self._get(self.BASE_URL)
+    def fetch(self, start_date: str, end_date: str) -> List[Dict]:
+        raw_csv = self._get(self.BASE_URL, raw=True)
 
-        mapped = self._mapper(raw_data)
+        mapped = self._mapper(raw_csv)
 
         return [
             item
@@ -27,17 +28,20 @@ class BigMacIndex(BaseConnection):
             if start_date <= item["date"] <= end_date
         ]
 
-    def _mapper(self, data: dict) -> List[Dict]:
-        result = []
+    def _mapper(self, raw_csv: str) -> List[Dict]:
+        reader = csv.DictReader(io.StringIO(raw_csv))
 
-        for row in data:
-            if row["country"] != self.country:
+        result: List[Dict] = []
+
+        for row in reader:
+            # kraj w CSV to kolumna "name"
+            if row["name"] != self.country:
                 continue
 
             result.append(
                 {
-                    "date": row["date"],              # YYYY-MM-DD
-                    "value": float(row["local"]),     # Big Mac price (float)
+                    "date": row["date"],                     # YYYY-MM-DD
+                    "value": float(row["local_price"]),      # cena Big Maca
                 }
             )
 

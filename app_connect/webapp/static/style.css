@@ -1,0 +1,37 @@
+button {
+    padding: 10px 20px;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+#btn {
+    background: green;
+    color: white;
+
+}
+
+.primary {
+    background: orange;
+}
+
+
+.container {
+    width: 300px;
+    margin: 0 auto; /* wyśrodkowanie */
+}
+
+#grey {
+    background: lightgray;
+}
+
+.box {
+    width: 300px;
+    margin: 0 auto;
+    background: lightgray;
+}
+
+
+.btn-center {
+    display: flex;
+    justify-content: center;
+}

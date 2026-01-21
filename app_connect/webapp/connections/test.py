@@ -1,11 +1,9 @@
-from webapp.connections.car_sales import CarSalesAPI
+from webapp.connections.bitcoin import BitcoinAPI
 
-def main() -> None:
-    api = CarSalesAPI()
-
-    data = api.fetch("2023-01-31", "2023-12-31")
-
-    print(data[:10])
+def main():
+    api = BitcoinAPI()
+    data = api.fetch("2023-01-01", "2023-01-10")
+    print(data)
 
 if __name__ == "__main__":
     main()

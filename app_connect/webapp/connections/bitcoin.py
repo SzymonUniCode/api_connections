@@ -1,7 +1,7 @@
 from typing import List, Dict
 from datetime import datetime
 
-from .base import BaseConnection
+from webapp.connections.base import BaseConnection
 from dotenv import load_dotenv
 import os
 
@@ -11,46 +11,39 @@ load_dotenv()
 class BitcoinAPI(BaseConnection):
     name = "bitcoin"
 
-    BASE_URL = "https://api.massive.com/v2/aggs/ticker/X:BTCUSD"
+    BASE_URL = "https://api.stlouisfed.org/fred/series/observations"
 
     def __init__(self):
-        self.api_key = os.getenv("BTC_API_KEY")
-
+        self.api_key = os.getenv("FRED_API_KEY")
         if not self.api_key:
-            raise ValueError("BASE_URL_BTC is not set in .env file")
+            raise ValueError("FRED_API_KEY is not set in .env file")
 
-
-    def fetch(
-        self,
-        start_date: str,
-        end_date: str,
-        timespan: str = "day",
-        multiplier: int = 1,
-    ) -> List[Dict]:
-
-
-        url = (
-            f"{self.BASE_URL}/range/"
-            f"{multiplier}/{timespan}/{start_date}/{end_date}"
-        )
-
+    def fetch(self, start_date: str, end_date: str) -> List[Dict]:
         raw_data = self._get(
-            url,
-            params={"apiKey": self.api_key},
+            self.BASE_URL,
+            params={
+                "series_id": "CBBTCUSD",
+                "api_key": self.api_key,
+                "file_type": "json",
+                "observation_start": start_date,
+                "observation_end": end_date,
+            },
         )
 
         return self._mapper(raw_data)
 
     def _mapper(self, data: dict) -> List[Dict]:
-        results = data.get("results", [])
+        results = []
 
-        mapped = []
-        for item in results:
-            mapped.append(
+        for obs in data.get("observations", []):
+            if obs["value"] == ".":
+                continue
+
+            results.append(
                 {
-                    "date": datetime.utcfromtimestamp(item["t"] / 1000).date().isoformat(),
-                    "value": float(item["c"])
+                    "date": obs["date"],          # YYYY-MM-DD
+                    "value": float(obs["value"]), # BTC/USD
                 }
             )
 
-        return mapped
+        return results

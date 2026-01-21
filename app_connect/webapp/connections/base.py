@@ -18,10 +18,14 @@ class BaseConnection(ABC):
 
 
     # method which is used to perform HTTP GET requests with common logic and return raw data
-    def _get(self, url: str, params: dict | None = None) -> dict:
+    def _get(self, url: str, params: dict | None = None, raw: bool = False) -> dict:
         """
         Wspólna metoda do wykonywania zapytań HTTP GET.
         """
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
+
+        if raw:
+            return response.text
+
         return response.json()
